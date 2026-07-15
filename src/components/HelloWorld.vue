@@ -1,24 +1,27 @@
 <template>
   <div class="container">
     <input v-if="!fileUrl" type="file" ref="fileInput" @change="()=> addFile()"/>
-      <img class="image" v-if="fileUrl" :src="fileUrl" @mousedown="(e: Event) => handleStartSelect(e)" @mouseup="()=> handleEndSelect()">
+      <img ref="image" class="image" v-if="fileUrl" :src="fileUrl" @mousedown="(e: MouseEvent) => handleStartSelect(e)" @mouseup="(e: MouseEvent) => handleEndSelect(e)" >
       <div v-if="needShowField" class="selectedField"></div>
+      
   </div>
 </template> 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, useTemplateRef } from 'vue';
 
 const fileInput = ref<HTMLInputElement>()
 const fileUrl = ref()
 const needShowField = ref(false)
 
+const image = useTemplateRef('image')
+
 const cursorStartPosition = ref({
-  x: '',
-  y: ''
+  x: 0 ,
+  y: 0
 })
 const cursorEndPosition = ref({
-  x: '',
-  y: ''
+  x: 0,
+  y: 0
 })
 
 const addFile = () => {
@@ -38,17 +41,28 @@ const addFile = () => {
   }
 }
 
-const handleStartSelect = (e: Event) => {
+const handleStartSelect = (e: MouseEvent) => {
   e.preventDefault();
-  needShowField.value = true
+  // needShowField.value = true
   console.log(e)
-  // cursorStartPosition.value.x = this.x 
-  // cursorStartPosition.value.y = this.y
-  // console.log(cursorStartPosition.value)
+  if(e?.offsetX && e?.offsetY){
+    cursorStartPosition.value.x = e.offsetX 
+    cursorStartPosition.value.y = e.offsetY
+  }
+  console.log(cursorStartPosition.value)
+  console.log(image.value?.offsetLeft)
+  console.log(image.value?.offsetTop)
+  console.log(image.value?.offsetWidth)
+  console.log(image.value?.offsetHeight)
 }
 
-const handleEndSelect = () => {
-
+const handleEndSelect = (e: MouseEvent) => {
+  console.log(e)
+  if(e?.x && e?.y){
+    cursorEndPosition.value.x = e.offsetX 
+    cursorEndPosition.value.y = e.offsetY
+  }
+  console.log(cursorEndPosition.value)
 }
 
 </script>
@@ -74,21 +88,21 @@ const handleEndSelect = () => {
 }
 
 .image {
-  width: 100%;
-  height: 100%;
+  width: auto;
+  height: auto;
   object-fit: contain;
   overflow: hidden ;
 }
 
 .selectedField{
   position: absolute;
-  border: 700px solid rgba(1, 1, 1, 0.6);
-  width: 0px;
-  height: 0px;
+  width: 1px;
+  height: 1px;
   z-index: 200;
   top: 0;
   left: 0px;
   right: 0px;
   bottom: 0;
+  box-shadow: 700px 700px 0px 700px   rgba(0, 0, 0, 0.5);
 }
 </style>

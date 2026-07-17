@@ -64,10 +64,46 @@ const getResult = () => {
   console.log('Result', toRaw(selectionFieldPosition.value))
   console.log(selectedArea.value?.offsetLeft, selectedArea.value?.offsetTop)
   console.log(canvas.value)
-  console.log(canvas.value?.width ?  Number((canvas.value?.width / 700).toFixed(2)) : 700)
-  console.log(canvas.value?.height ?  Number((canvas.value?.height / 500).toFixed(2)) : 500)
+  const scaleWidthValue = canvas.value?.width ?  Number((canvas.value?.width / 700)) : 700
+  const scaleHeightValue = canvas.value?.height ?  Number((canvas.value?.height / 500)) : 500
+  console.log(scaleWidthValue)
+  console.log(scaleHeightValue)
 
+  const dx = (selectionFieldPosition.value.left + 10) * scaleWidthValue
+  const dy = (selectionFieldPosition.value.top + 10) * scaleHeightValue
+  const dWith = (selectionFieldPosition.value.width -10) * scaleWidthValue
+  const dHeight = (selectionFieldPosition.value.height -10) * scaleHeightValue
 
+  const canvasImage = canvas.value as HTMLCanvasElement
+  const ctx = canvasImage?.getContext('2d')
+
+  const cropCanvas = document.createElement('canvas')
+  cropCanvas.width = dWith
+  cropCanvas.height = dHeight
+  const cropCtx = cropCanvas?.getContext('2d')
+  cropCtx?.drawImage(
+    canvasImage,
+    dx,
+    dy,
+    dWith,
+    dHeight,
+    0,
+    0,
+    dWith,
+    dHeight
+  )
+
+  const croppedImage = new Image()
+  croppedImage.src = cropCanvas.toDataURL()
+  croppedImage.onload = () => {
+    
+
+    console.log(croppedImage)
+  }
+  const link = document.createElement('a')
+  link.download = 'cropped-image.png'
+  link.href = cropCanvas.toDataURL()
+  link.click()
 }
 
 const addFile = () => {
